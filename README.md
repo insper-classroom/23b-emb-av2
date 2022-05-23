@@ -1,8 +1,38 @@
-# 22a - Avaliação Prática 2
+# 22a - EMB - AV2
 
-Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também irá verificar algumas condições de alarme  
+- A prova é prática, com o objetivo de avaliar sua compreensão a cerca do conteúdo ministrado pela disciplina. 
+- É permitido consulta a todo material pessoal (suas anotações, códigos) e publico (github e internet), mas não pode consultar outros alunos.
+- **Lembre que e' boa prática a cada 30 minutos fazer um commit no seu código!**
+- Duração total: 2h + 1h extra
 
-## Visão geral do firmware
+>  Criar o repositório de entrega pelo link:
+>  - https://classroom.github.com/a/cFcTMHtX
+>
+>  Use como base o código disponível neste repositório.
+
+**Você vai precisar:**
+
+- ▶️ Kit SAME70-XPLD
+- ▶️ Conectar o OLED1 ao EXT-1
+- ▶️ Conectar o Potenciômetro no pino PD30
+
+**Periféricos que vai precisar utilizar:**
+
+- Botões e Leds (OLED)
+- PIO
+- TC
+- RTC
+- Uart console (printf)
+
+**Código exemplo fornecido:**
+
+No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (io_init) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para não mexer nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errado com o seu programa).
+
+## Descritivo
+
+Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também irá verificar algumas condições de alarme .
+
+### Visão geral do firmware
 
 ![](diagrama.png)
 
@@ -28,7 +58,7 @@ A task, ao receber os dados deve realizar a seguinte ação:
 1. Enviar pela UART o novo valor no formato a seguir:
     - `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` (`$VALOR` deve ser o valor lido no AFEC)
 1. Verificar a condicão de alarme:
-    - 15 segundos com AFEC maior que 3000
+    - 5 segundos com AFEC maior que 3000
     
 Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAlarm`.
 
@@ -42,12 +72,15 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAl
 | `xQueueEvent`          | Recebimento dos eventos de botão                     |
 | `xSemaphoreEventAlarm` | Liberação da `task_alarm` devido a condição de alarm |
 
+
 A `task_event` será responsável por ler eventos de botão (subida, descida), para isso será necessário usar as interrupções nos botões e enviar pela fila `xQueueEvent` o ID do botão e o status (on/off). A cada evento a task deve formatar e enviar um log pela UART e também verificar a condição de alarme.
 
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status` (`$ID:$Status`: id do botão e status)
+    - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status`L
+        - `$ID`: id do botão (1,2,3)
+        - `$status`: 1 (apertado), 0 (solto)
 1. Verificar a condicão de alarme:
     - Dois botões pressionados ao mesmo tempo
     
@@ -65,7 +98,7 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventA
 Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela serial, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferentes da placa OLED: 
 
 - `EVENT`: LED1
-- `AFEC`: LED2
+- `AFEC `: LED2
 
 Os alarmes são ativos pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEventAlarm`. Uma vez ativado o alarme o mesmo deve ficar ativo até a placa reiniciar.
 
@@ -82,18 +115,16 @@ A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no
  [AFEC ] 19:03:2018 15:45:02 1222
  [AFEC ] 19:03:2018 15:45:03 1234
  [AFEC ] 19:03:2018 15:45:04 1225
- [EVENT] 19:03:2018 15:45:04 01:PRESS
+ [EVENT] 19:03:2018 15:45:04  1:1
  [AFEC ] 19:03:2018 15:45:04 1245
  [AFEC ] 19:03:2018 15:45:05 1245
- [EVENT] 19:03:2018 15:45:05 01:RELEASED
+ [EVENT] 19:03:2018 15:45:05  1:0
  [AFEC ] 19:03:2018 15:45:06 4000
  [AFEC ] 19:03:2018 15:45:07 4004
+ [AFEC ] 19:03:2018 15:45:08 4002
  [AFEC ] 19:03:2018 15:45:08 4001
- 
-  -------- passam mais 6 segundos ------
- 
- [AFEC ] 19:03:2018 15:45:14 4023
- [ALARM] 19:03:2018 15:45:14 AFEC
+ [AFEC ] 19:03:2018 15:45:08 4001
+ [ALARM] 19:03:2018 15:45:09 AFEC
 ```
 
 ### Resumo
@@ -117,6 +148,20 @@ A seguir um resumo do que deve ser implementando:
     - Pisca led 2 dado se alarm EVENT ativo
 
 Não devem ser utilizadas variáveis globais além das filas e semáforos.
+
+### Dicas
+
+Comeće pela `task_event` depois faća a `task_afec` e então a `task_alarm`.
+
+### Binário exemplo
+
+No repositório tem o binário da solução (`solucao.elf`) que deve ser implementada, indicamos que todos rodem antes de comecarem a resolução da avaliaćão. 
+
+Lembrem de abrir o terminal do Microchip Studio para ver as informações de debug.
+
+Se você não lembra como fazer isso, assista ao vídeo a seguir:
+
+- https://www.youtube.com/watch?v=yAgsnUbYcWk
 
 ## Ganhando conceitos
 
