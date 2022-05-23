@@ -26,7 +26,7 @@ A `task_adc` vai ser responsável por coletar dados de uma entrada analógica vi
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[AFEC] DD:MM:YYYY HH:MM:SS $VALOR` (`$VALOR` deve ser o valor lido no AFEC)
+    - `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` (`$VALOR` deve ser o valor lido no AFEC)
 1. Verificar a condicão de alarme:
     - 15 segundos com AFEC maior que 3000
     
@@ -40,18 +40,18 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAl
 | PIO                    | Leitura dos botões                                   |
 |------------------------|------------------------------------------------------|
 | `xQueueEvent`          | Recebimento dos eventos de botão                     |
-| `xSemaphoreEventAlarm` | Liberacao da `task_alarm` devido a condição de alarm |
+| `xSemaphoreEventAlarm` | Liberação da `task_alarm` devido a condição de alarm |
 
 A `task_event` será responsável por ler eventos de botão (subida, descida), para isso será necessário usar as interrupções nos botões e enviar pela fila `xQueueEvent` o ID do botão e o status (on/off). A cada evento a task deve formatar e enviar um log pela UART e também verificar a condição de alarme.
 
-A task, ao receber os dados deve realizar a seguinte acao:
+A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
     - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status` (`$ID:$Status`: id do botão e status)
 1. Verificar a condicão de alarme:
     - Dois botões pressionados ao mesmo tempo
     
-Caso a condicao de alarme seja atingida liberar o semáforo `xSemaphoreEventAlarm`.
+Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventAlarm`.
 
 ### task_alarm
 
@@ -62,7 +62,7 @@ Caso a condicao de alarme seja atingida liberar o semáforo `xSemaphoreEventAlar
 | `xSemaphoreAfecAlarm`  | Indica alarme ativado deviado a task_afec  |
 | `xSemaphoreEventAlarm` | Indica alarme ativado deviado a task_event |
 
-Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela seria, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferentes da placa OLED: 
+Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela serial, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferentes da placa OLED: 
 
 - `AFEC`: LED1
 - `EVENT`: LED2
@@ -106,7 +106,7 @@ A seguir um resumo do que deve ser implementando:
 - Leitura dos botões do OLED via IRQ e envio do dado para fila `xQueueEvent`
 - `task_afec`
     - log:  `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` 
-    - alarm se valor afec maior > 3000 durante 10s
+    - alarm se valor afec maior que 3000 durante 10s
         - libera semáforo `xSemaphoreAfecAlarm`
 - `task_event`
     - log:  `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$STATUS` 
