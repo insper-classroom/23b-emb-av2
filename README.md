@@ -155,7 +155,7 @@ Comeće pela `task_event` depois faća a `task_afec` e então a `task_alarm`.
 
 ### Binário exemplo
 
-No repositório tem o binário da solução (`solucao.elf`) que deve ser implementada, indicamos que todos rodem antes de comecarem a resolução da avaliaćão. 
+No repositório tem o binário da solução ([solucao.elf](https://github.com/insper-classroom/22a-emb-av2/blob/main/solucao.elf)) que deve ser implementada, indicamos que todos rodem antes de comecarem a resolução da avaliaćão. 
 
 Lembrem de abrir o terminal do Microchip Studio para ver as informações de debug.
 
