@@ -1,6 +1,6 @@
 # 22a - Avaliação Prática 2
 
-Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também verificar algumas condicoes de alarme  
+Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também irá verificar algumas condições de alarme  
 
 ## Visão geral do firmware
 
