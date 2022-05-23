@@ -5,7 +5,7 @@
 - **Lembre que e' boa prática a cada 30 minutos fazer um commit no seu código!**
 - Duração total: 2h + 1h extra
 
-> 1. A apresentação do conceito C deve ser feita em sala de aula por um dos membros da equipe
+> 1. A avaliação do conceito C deve ser feita em sala de aula por um dos membros da equipe
 > 2. A entrega do projeto deve ser feita no git
 > 3. ⚠️ Fazer o envio pelo forms:
 >   - https://docs.google.com/forms/d/e/1FAIpQLScG1W5NKQ9MjmJJzgQ9pYsm_kYpOAp-WqrbqLF-3M7o9lyxCQ/viewform?usp=sf_link
@@ -166,7 +166,7 @@ Se você não lembra como fazer isso, assista ao vídeo a seguir:
 ## Entrega
 
 1. A apresentação do conceito C deve ser feita em sala de aula por um dos membros da equipe
-2. A entrega do projeto deve ser feita no git
+2. A avaliação do projeto deve ser feita no git
 3. ⚠️ Fazer o envio pelo forms:
    - https://docs.google.com/forms/d/e/1FAIpQLScG1W5NKQ9MjmJJzgQ9pYsm_kYpOAp-WqrbqLF-3M7o9lyxCQ/viewform?usp=sf_link
 
