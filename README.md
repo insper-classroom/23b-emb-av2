@@ -183,6 +183,7 @@ Você pode fazer qualquer combinacão dos itens a seguir para melhorar sua nota,
 - (meio conceito) Adicionar mais um botão externo a placa (usando protoboard)
 - (meio conceito) Desligar o alarme do AFEC se ele passar 10 segundos em um valor menor que 1000
 - (meio conceito) No lugar do TC do AFEC use um RTT
+- (meio conceito) Usa MUTEX no acesso ao printf
 - (um conceito) Adicionar mais um AFEC (nova task)
 - (um conceito) Desligar o alarme por um comando da UART
     - receber o valor `a` desliga o alarme do AFEC
