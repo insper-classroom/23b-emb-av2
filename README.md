@@ -1,12 +1,12 @@
 # 22a - Avaliação Prática 2
 
-Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também verificar algumas condicoes de alarme  
+Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também verificar algumas condições de alarme  
 
 ## Visão geral do firmware
 
 ![](diagrama.png)
 
-O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC um log formatado seja enviado pela UART (`printf`) e uma verificacão das condicoes de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log que será enviado pela UART deve possuir um timestamp que indicará quando o dado foi lido pelo sistema embarcado (DIA:MES:ANO HORA:MINUTO:SEGUNDO).
+O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC um log formatado seja enviado pela UART (`printf`) e uma verificação das condições de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log que será enviado pela UART deve possuir um timestamp que indicará quando o dado foi lido pelo sistema embarcado (DIA:MES:ANO HORA:MINUTO:SEGUNDO).
 
 A seguir mais detalhes de cada uma das tarefa:
 
@@ -17,9 +17,9 @@ A seguir mais detalhes de cada uma das tarefa:
 | RTC                   | Fornecer as informacões do TimeStamp                 |
 | TC                    | Gerar o 1hz do AFEC                                  |
 | AFEC                  | Leitura analógica                                    |
-|------------------------|------------------------------------------------------|
+|-----------------------|------------------------------------------------------|
 | `xQueueAFEC`          | Recebimento do valor do ADC                          |
-| `xSemaphoreAfecAlarm` | Liberacao da `task_alarm` devido a condição de alarm |
+| `xSemaphoreAfecAlarm` | Liberação da `task_alarm` devido a condição de alarm |
 
 A `task_adc` vai ser responsável por coletar dados de uma entrada analógica via AFEC (usando algum TC para a base de tempo), os dados devem ser enviados do *callback* do AFEC via a fila `xQueueADC` a uma taxa de uma amostra por segundo (1hz). A cada novo dado do AFEC a condicao de alarme deve ser verificada.
 
@@ -59,13 +59,13 @@ Caso a condicao de alarme seja atingida liberar o semáforo `xSemaphoreEventAlar
 |------------------------|--------------------------------------------|
 | PIO                    | Acionamento dos LEDs                       |
 |------------------------|--------------------------------------------|
-| `xSemaphoreAfecAlarm`  | Indica alarme ativado deviado a task_afec  |
-| `xSemaphoreEventAlarm` | Indica alarme ativado deviado a task_event |
+| `xSemaphoreAfecAlarm`  | Indica alarme ativado devido a task_afec  |
+| `xSemaphoreEventAlarm` | Indica alarme ativado devido a task_event |
 
 Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela seria, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferentes da placa OLED: 
 
-- `AFEC`: LED1
-- `EVENT`: LED2
+- `EVENT`: LED1
+- `AFEC`: LED2
 
 Os alarmes são ativos pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEventAlarm`. Uma vez ativado o alarme o mesmo deve ficar ativo até a placa reiniciar.
 
@@ -75,9 +75,7 @@ Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato de
 
 ### Exemplo de log
 
-A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no segundo 04 o botão 1 foi pressionado,
-e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 10 segundos, ativando
-o alarme no segundo 14.
+A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no segundo 04 o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 10 segundos, ativando o alarme no segundo 14.
 
 ``` 
  [AFEC ] 19:03:2018 15:45:01 1220
@@ -113,13 +111,27 @@ A seguir um resumo do que deve ser implementando:
     - alarm se dois botões pressionados ao mesmo tempo
         - libera semáforo `xSemaphoreEventAlarm`
 - `task_alarm`
-    - log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
-    - Pisca led 1 dado se `xSemaphoreAfecAlarm`
-    - Pisca led 2 dado se `xSemaphoreEventAlarm`
+    - verifica dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`
+    - recebido um semáforo gear o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
+    - Pisca led 1 dado se alarm AFEC ativo `xSemaphoreAfecAlarm`
+    - Pisca led 2 dado se alarm EVENT ativo
 
 Não devem ser utilizadas variáveis globais além das filas e semáforos.
 
 ## Ganhando conceitos
 
-- (meio conceito) desligar o alarme do AFEC se ele passar 10 segundos em um valor menor que 1000
-- (meio conceito) Exibir no OLED os Logs (um por liinha)
+Você pode fazer qualquer combinacão dos itens a seguir para melhorar sua nota, cada item possui um acréscimo no conceito:
+
+- (meio conceito) Exibir no OLED um logs simplificado (um por linha):
+    ```  
+    mm:ss AFEC
+    mm:ss Event
+    ```
+- (meio conceito) Quanto ativado o LED devido a um alarme (event e afec), pisca usando os TCs
+- (meio conceito) Adicionar mais um botão externo a placa (usando protoboard)
+- (meio conceito) Desligar o alarme do AFEC se ele passar 10 segundos em um valor menor que 1000
+- (meio conceito) No lugar do TC do AFEC use um RTT
+- (um conceito) Adicionar mais um AFEC (nova task)
+- (um conceito) Desligar o alarme por um comando da UART
+    - receber o valor `a` desliga o alarme do AFEC
+    - receber o valor `e` desliga o alarme de EVENT
