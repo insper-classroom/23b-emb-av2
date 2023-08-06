@@ -1,14 +1,16 @@
-# 22a - EMB - AV2
+# 23a - EMB - SUB
 
-- A prova é prática, com o objetivo de avaliar sua compreensão a cerca do conteúdo ministrado pela disciplina. 
-- É permitido consulta a todo material pessoal (suas anotações, códigos) e publico (github e internet), mas não pode consultar outros alunos.
-- **Lembre que e' boa prática a cada 30 minutos fazer um commit no seu código!**
-- Duração total: 2h + 1h extra
+Prezado aluno:
 
-> 1. A avaliação do conceito C deve ser feita em sala de aula por um dos membros da equipe
-> 2. A entrega do projeto deve ser feita no git
-> 3. ⚠️ Fazer o envio pelo forms:
->   - https://docs.google.com/forms/d/e/1FAIpQLScG1W5NKQ9MjmJJzgQ9pYsm_kYpOAp-WqrbqLF-3M7o9lyxCQ/viewform?usp=sf_link
+- A prova é prática, com o objetivo de avaliar sua compreensão a cerca do conteúdo da disciplina. 
+- É permitido consulta a todo material pessoal (suas anotações, códigos), lembre que você mas não pode consultar outros alunos.
+- Duração total: 3h + 1h extra
+
+Sobre a avaliacão:
+
+1. Você deve satisfazer ambos os requisitos: funcional e código para ter o aceite na avaliação 
+1. A avaliação de C deve ser feita em sala de aula por um dos membros da equipe
+2. A entrega do código deve ser realizada no git
 
 **Você vai precisar:**
 
@@ -26,7 +28,7 @@
 
 **Código exemplo fornecido:**
 
-No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (io_init) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para não mexer nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errado com o seu programa).
+No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (`io_init`) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para não mexer nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errado com o seu programa).
 
 ## Descritivo
 
@@ -44,7 +46,7 @@ A seguir mais detalhes de cada uma das tarefa:
 
 | Recurso               | Explicacao                                           |
 |-----------------------|------------------------------------------------------|
-| RTC                   | Fornecer as informacões do TimeStamp                 |
+| RTC                   | Fornecer as informações do TimeStamp                 |
 | TC                    | Gerar o 1hz do AFEC                                  |
 | AFEC                  | Leitura analógica                                    |
 |-----------------------|------------------------------------------------------|
@@ -127,6 +129,15 @@ A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no
  [ALARM] 19:03:2018 15:45:09 AFEC
 ```
 
+### OLED
+
+Exibir no OLED um logs simplificado (um por linha):
+
+```  
+mm:ss AFEC
+mm:ss Event
+```
+
 ### Resumo
 
 A seguir um resumo do que deve ser implementando:
@@ -143,15 +154,16 @@ A seguir um resumo do que deve ser implementando:
         - libera semáforo `xSemaphoreEventAlarm`
 - `task_alarm`
     - verifica dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`
-    - recebido um semáforo gear o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
-    - Pisca led 1 dado se alarm AFEC ativo `xSemaphoreAfecAlarm`
-    - Pisca led 2 dado se alarm EVENT ativo
-
+    - liberado o semáforo gerar o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
+    - piscar led 1 dado se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
+    - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
+    - escrever no OLED
+    
 Não devem ser utilizadas variáveis globais além das filas e semáforos.
 
 ### Dicas
 
-Comeće pela `task_event` depois faća a `task_afec` e então a `task_alarm`.
+Comeće pela `task_event` depois faca a `task_afec` e então a `task_alarm`.
 
 ### Binário exemplo
 
@@ -162,29 +174,3 @@ Lembrem de abrir o terminal do Microchip Studio para ver as informações de deb
 Se você não lembra como fazer isso, assista ao vídeo a seguir:
 
 - https://www.youtube.com/watch?v=yAgsnUbYcWk
-
-## Entrega
-
-1. A apresentação do conceito C deve ser feita em sala de aula por um dos membros da equipe
-2. A avaliação do projeto deve ser feita no git
-3. ⚠️ Fazer o envio pelo forms:
-   - https://docs.google.com/forms/d/e/1FAIpQLScG1W5NKQ9MjmJJzgQ9pYsm_kYpOAp-WqrbqLF-3M7o9lyxCQ/viewform?usp=sf_link
-
-### Ganhando conceitos
-
-Você pode fazer qualquer combinacão dos itens a seguir para melhorar sua nota, cada item possui um acréscimo no conceito:
-
-- (meio conceito) Exibir no OLED um logs simplificado (um por linha):
-    ```  
-    mm:ss AFEC
-    mm:ss Event
-    ```
-- (meio conceito) Quanto ativado o LED devido a um alarme (event e afec), pisca usando os TCs
-- (meio conceito) Adicionar mais um botão externo a placa (usando protoboard)
-- (meio conceito) Desligar o alarme do AFEC se ele passar 10 segundos em um valor menor que 1000
-- (meio conceito) No lugar do TC do AFEC use um RTT
-- (meio conceito) Usa MUTEX no acesso ao printf
-- (um conceito) Adicionar mais um AFEC (nova task)
-- (um conceito) Desligar o alarme por um comando da UART
-    - receber o valor `a` desliga o alarme do AFEC
-    - receber o valor `e` desliga o alarme de EVENT
