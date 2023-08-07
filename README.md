@@ -159,7 +159,9 @@ A seguir um resumo do que deve ser implementando:
     - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
     - printar no OLED
     
-:bangbang: Não devem ser utilizadas **variáveis globais**, todo o tráfego de dados/variáveis deve ser feito através das filas e semáforos. :bangbang:
+:bangbang: :warning: :bangbang: 
+## Não devem ser utilizadas **variáveis globais**, todo o tráfego de dados/variáveis deve ser feito através das filas e semáforos. ##
+:bangbang: :warning: :bangbang:
 
 ### Dicas
 
