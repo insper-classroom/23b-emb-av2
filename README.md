@@ -43,10 +43,6 @@ O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_a
 A seguir mais detalhes de cada uma das tarefa:
 
 ### task_adc
-<span style="color:red">some *task_adc* text</span>.
-
-<span style="color:red">task_adc</span>
-
 
 | Recurso               | Explicação                                           |
 |-----------------------|------------------------------------------------------|
@@ -101,12 +97,12 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventA
 | `xSemaphoreAfecAlarm`  | Indica alarme ativado devido a task_afec  |
 | `xSemaphoreEventAlarm` | Indica alarme ativado devido a task_event |
 
-Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela serial, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferentes da placa OLED: 
+Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `event`. A cada ativacão do alarme a task deve emitir um Log pela serial, O alarme vai ser um simples pisca LED, para cada um dos alarmes vamos atribuir um LED diferente da placa OLED: 
 
 - `EVENT`: LED1
 - `AFEC `: LED2
 
-Os alarmes são ativos pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEventAlarm`. Uma vez ativado o alarme o mesmo deve ficar ativo até a placa reiniciar.
+Os alarmes são ativados pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEventAlarm`. Uma vez ativado o alarme, o mesmo deve ficar ativo até a placa reiniciar.
 
 Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato descrito a seguir:
 
@@ -114,7 +110,7 @@ Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato de
 
 ### Exemplo de log
 
-A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no segundo 04 o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 10 segundos, ativando o alarme no segundo 14.
+A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no segundo 04 (5ª do log) o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 10 segundos, ativando o alarme no segundo 14.
 
 ``` 
  [AFEC ] 19:03:2018 15:45:01 1220
@@ -135,7 +131,7 @@ A seguir um exemplo de log, no caso conseguimos verificar a leitura do AFEC e no
 
 ### OLED
 
-Exibir no OLED um logs simplificado (um por linha):
+Exibir no OLED um log simplificado (um por linha):
 
 ```  
 mm:ss AFEC
@@ -146,35 +142,36 @@ mm:ss Event
 
 A seguir um resumo do que deve ser implementando:
 
-- Leitura do AFEC via TC 1hz e envio do dado para fila `xQueueAfec`
+- Leitura do AFEC via TC 1hz e envio do dado para a fila `xQueueAfec`
 - Leitura dos botões do OLED via IRQ e envio do dado para fila `xQueueEvent`
 - `task_afec`
     - log:  `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` 
-    - alarm se valor afec maior que 3000 durante 10s
+    - alarme se o valor do AFEC estiver maior que 3000 durante 10s
         - libera semáforo `xSemaphoreAfecAlarm`
 - `task_event`
     - log:  `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$STATUS` 
-    - alarm se dois botões pressionados ao mesmo tempo
+    - alarme se houver dois botões pressionados ao mesmo tempo
         - libera semáforo `xSemaphoreEventAlarm`
 - `task_alarm`
     - verifica dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`
-    - liberado o semáforo gerar o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
+    - quanto liberado o semáforo, gerar o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
     - piscar led 1 dado se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
     - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
-    - escrever no OLED
+    - printar no OLED
     
-Não devem ser utilizadas variáveis globais além das filas e semáforos.
+:bangbang: Não devem ser utilizadas **variáveis globais**, todo o tráfego de dados/variáveis deve ser feito através das filas e semáforos. :bangbang:
 
 ### Dicas
 
-Comeće pela `task_event` depois faca a `task_afec` e então a `task_alarm`.
+Comece pela `task_event` depois faça a `task_afec` e então a `task_alarm`.
 
 ### Binário exemplo
 
-No repositório tem o binário da solução ([solucao.elf](https://github.com/insper-classroom/22a-emb-av2/blob/main/solucao.elf)) que deve ser implementada, indicamos que todos rodem antes de comecarem a resolução da avaliaćão. 
+- No repositório tem o binário da solução ([solucao.elf](https://github.com/insper-classroom/22a-emb-av2/blob/main/solucao.elf)) que deve ser implementada, é aconselhável que todos rodem a solução antes de começarem a resolução da avaliação.
+- 
+- Se você não lembra como fazer isso, assista ao vídeo do link abaixo:
+https://www.youtube.com/watch?v=yAgsnUbYcWk 
 
-Lembrem de abrir o terminal do Microchip Studio para ver as informações de debug.
+- Não esqueçam abrir o terminal do **Microchip Studio** para ver as informações de debug.
 
-Se você não lembra como fazer isso, assista ao vídeo a seguir:
 
-- https://www.youtube.com/watch?v=yAgsnUbYcWk
