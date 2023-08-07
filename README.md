@@ -160,7 +160,7 @@ A seguir um resumo do que deve ser implementando:
     - printar no OLED
     
 :bangbang: :warning: :bangbang: 
-## Não devem ser utilizadas **variáveis globais**, todo o tráfego de dados/variáveis deve ser feito através das filas e semáforos. ##
+### Não devem ser utilizadas **variáveis globais**, todo o tráfego de dados/variáveis deve ser feito através das filas e semáforos. ###
 :bangbang: :warning: :bangbang:
 
 ### Dicas
