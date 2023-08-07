@@ -43,11 +43,12 @@ O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_a
 A seguir mais detalhes de cada uma das tarefa:
 
 ### task_adc
+<span style="color:red">some *task_adc* text</span>.
 
-| Recurso               | Explicacao                                           |
+| Recurso               | Explicação                                           |
 |-----------------------|------------------------------------------------------|
 | RTC                   | Fornecer as informações do TimeStamp                 |
-| TC                    | Gerar o 1hz do AFEC                                  |
+| TC                    | Gerar o 1hz para a leitura do AFEC                   |
 | AFEC                  | Leitura analógica                                    |
 |-----------------------|------------------------------------------------------|
 | `xQueueAFEC`          | Recebimento do valor do ADC                          |
@@ -58,15 +59,15 @@ A `task_adc` vai ser responsável por coletar dados de uma entrada analógica vi
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` (`$VALOR` deve ser o valor lido no AFEC)
+    - `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR`  --->  ( `$VALOR` deve ser o valor lido no AFEC )
 1. Verificar a condicão de alarme:
-    - 5 segundos com AFEC maior que 3000
+    - 5 segundos com o valor do AFEC maior que 3000
     
 Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAlarm`.
 
 ### task_event 
 
-| Recurso                | Explicacao                                           |
+| Recurso                | Explicação                                           |
 |------------------------|------------------------------------------------------|
 | RTC                    | Fornecer as informações do TimeStamp                 |
 | PIO                    | Leitura dos botões                                   |
@@ -80,17 +81,17 @@ A `task_event` será responsável por ler eventos de botão (subida, descida), p
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status`L
+    - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$status`
         - `$ID`: id do botão (1,2,3)
         - `$status`: 1 (apertado), 0 (solto)
-1. Verificar a condicão de alarme:
+1. Verificar a condição de alarme:
     - Dois botões pressionados ao mesmo tempo
     
 Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventAlarm`.
 
 ### task_alarm
 
-| Recurso                | Explicacao                                 |
+| Recurso                | Explicação                                 |
 |------------------------|--------------------------------------------|
 | PIO                    | Acionamento dos LEDs                       |
 |------------------------|--------------------------------------------|
