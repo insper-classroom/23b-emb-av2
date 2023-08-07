@@ -45,6 +45,9 @@ A seguir mais detalhes de cada uma das tarefa:
 ### task_adc
 <span style="color:red">some *task_adc* text</span>.
 
+<span style="color:red">task_adc</span>
+
+
 | Recurso               | Explicação                                           |
 |-----------------------|------------------------------------------------------|
 | RTC                   | Fornecer as informações do TimeStamp                 |
