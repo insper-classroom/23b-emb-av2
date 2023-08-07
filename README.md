@@ -8,9 +8,9 @@ Prezado aluno:
 
 Sobre a avaliacão:
 
-1. Você deve satisfazer ambos os requisitos: funcional e código para ter o aceite na avaliação 
-1. A avaliação de C deve ser feita em sala de aula por um dos membros da equipe
-2. A entrega do código deve ser realizada no git
+1. Você deve satisfazer ambos os requisitos: funcional e código para ter o aceite na avaliação;
+1. A avaliação de C deve ser feita em sala de aula por um dos membros da equipe (Professor ou Técnico);
+2. A entrega do código deve ser realizada no git.
 
 **Você vai precisar:**
 
@@ -24,21 +24,21 @@ Sobre a avaliacão:
 - PIO
 - TC
 - RTC
-- Uart console (printf)
+- UART console (printf)
 
 **Código exemplo fornecido:**
 
-No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (`io_init`) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para não mexer nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errado com o seu programa).
+No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (`io_init`) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para **não mexer** nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errada com o seu programa).
 
 ## Descritivo
 
-Vamos criar um protótipo de um dataloger, um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata e envia para um dispositivo externo. O envio da informação será feito pela UART. O dataloger também irá verificar algumas condições de alarme .
+Vamos criar um protótipo de um datalogger, onde um sistema embarcado coleta periodicamente valores e eventos do mundo real, formata os dados e envia para um dispositivo externo. O envio da informação será feito pela UART. O datalogger também irá verificar algumas condições de alarme.
 
 ### Visão geral do firmware
 
 ![](diagrama.png)
 
-O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC um log formatado seja enviado pela UART (`printf`) e uma verificação das condições de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log que será enviado pela UART deve possuir um timestamp que indicará quando o dado foi lido pelo sistema embarcado (DIA:MES:ANO HORA:MINUTO:SEGUNDO).
+O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC, um log formatado seja enviado pela UART (`printf`) e uma verificação das condições de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log que será enviado pela UART deve possuir um timestamp que indicará quando o dado foi lido pelo sistema (DIA:MES:ANO HORA:MINUTO:SEGUNDO).
 
 A seguir mais detalhes de cada uma das tarefa:
 
