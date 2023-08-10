@@ -110,7 +110,7 @@ Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato de
 
 ### Exemplo de log
 
-A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no segundo 04 (5ª do log) o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 10 segundos, ativando o alarme no segundo 14.
+A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no segundo 04 (5ª do log) o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 5 segundos, ativando o alarme no segundo 9.
 
 ``` 
  [AFEC ] 19:03:2018 15:45:01 1220
@@ -146,7 +146,7 @@ A seguir um resumo do que deve ser implementando:
 - Leitura dos botões do OLED via IRQ e envio do dado para fila `xQueueEvent`
 - `task_afec`
     - log:  `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` 
-    - alarme se o valor do AFEC estiver maior que 3000 durante 10s
+    - alarme se o valor do AFEC estiver maior que 3000 durante 5s
         - libera semáforo `xSemaphoreAfecAlarm`
 - `task_event`
     - log:  `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$STATUS` 
