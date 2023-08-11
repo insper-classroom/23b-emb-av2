@@ -64,6 +64,12 @@ A task, ao receber os dados deve realizar a seguinte ação:
     
 Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAlarm`.
 
+#### Log
+
+O seguinte log deve ser enviado para a serial assim que lido um valor do AFEC.
+
+- `[AFEC] DD:MM:YYYY HH:MM:SS $Valor` (onde `$Valor` é o valor do AFEC).
+
 ### task_event 
 
 | Recurso                | Explicação                                           |
@@ -88,6 +94,12 @@ A task, ao receber os dados deve realizar a seguinte ação:
     
 Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventAlarm`.
 
+#### Log
+
+O seguinte log deve ser enviado para a serial assim que detectado um evento no botão (subida/descida).
+
+- `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status`
+
 ### task_alarm
 
 | Recurso                | Explicação                                 |
@@ -104,11 +116,22 @@ Responsável por gerenciar cada um dos tipos de alarme diferente: `afec` e `even
 
 Os alarmes são ativados pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEventAlarm`. Uma vez ativado o alarme, o mesmo deve ficar ativo até a placa reiniciar.
 
+#### Log
+
 Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato descrito a seguir:
 
 - `[ALARM] DD:MM:YYYY HH:MM:SS $Alarm` (onde `$Alarm` indica qual alarme que foi ativo).
 
-### Exemplo de log
+#### OLED
+
+Exibir no OLED um log simplificado (um por linha):
+
+```  
+mm:ss AFEC
+mm:ss Event
+```
+
+### Exemplo de log completo
 
 A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no segundo 04 (5ª do log) o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 5 segundos, ativando o alarme no segundo 9.
 
@@ -129,16 +152,7 @@ A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no s
  [ALARM] 19:03:2018 15:45:09 AFEC
 ```
 
-### OLED
-
-Exibir no OLED um log simplificado (um por linha):
-
-```  
-mm:ss AFEC
-mm:ss Event
-```
-
-### Resumo
+## Resumo
 
 A seguir um resumo do que deve ser implementando:
 
@@ -157,23 +171,10 @@ A seguir um resumo do que deve ser implementando:
     - quanto liberado o semáforo, gerar o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
     - piscar led 1 dado se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
     - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
-    - printar no OLED
+    - Exibir no OLED as informações do alarme
     
-:bangbang: :warning: :bangbang: 
-### Não devem ser utilizadas **variáveis globais**, todo o processo deve ser feito através das filas e semáforos. ###
-:bangbang: :warning: :bangbang:
+:bangbang: :warning: :bangbang: Não devem ser utilizadas **variáveis globais**, todo o processo deve ser feito através das filas e semáforos. :bangbang: :warning: :bangbang:
 
 ### Dicas
 
 Comece pela `task_event` depois faça a `task_afec` e então a `task_alarm`.
-
-### Binário exemplo
-
-- No repositório tem o binário da solução ([solucao.elf](https://github.com/insper-classroom/22a-emb-av2/blob/main/solucao.elf)) que deve ser implementada, é aconselhável que todos rodem a solução antes de começarem a resolução da avaliação.
-- 
-- Se você não lembra como fazer isso, assista ao vídeo do link abaixo:
-https://www.youtube.com/watch?v=yAgsnUbYcWk 
-
-- Não esqueçam abrir o terminal do **Microchip Studio** para ver as informações de debug.
-
-
