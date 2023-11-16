@@ -160,7 +160,7 @@ A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no s
 
 A seguir um resumo do que deve ser implementando:
 
-- Leitura do AFEC via TC 1hz e envio do dado para a fila `xQueueAfec`
+- Leitura do AFEC de 1hz e envio do dado para a fila `xQueueAfec`
 - Leitura dos botões do OLED via IRQ e envio do dado para fila `xQueueEvent`
 - `task_afec`
     - log:  `[AFEC ] $SS $VALOR` 
