@@ -1,10 +1,10 @@
-# 23a - EMB - SUB
+# 23b - emb  - av2
 
 Prezado aluno:
 
 - A prova é prática, com o objetivo de avaliar sua compreensão a cerca do conteúdo da disciplina. 
 - É permitido consulta a todo material pessoal (suas anotações, códigos), lembre que você mas não pode consultar outros alunos.
-- Duração total: 3h + 1h extra
+- Duração total: 3h
 
 Sobre a avaliacão:
 
@@ -20,15 +20,14 @@ Sobre a avaliacão:
 
 **Periféricos que vai precisar utilizar:**
 
-- Botões e Leds (OLED)
+- OLED
 - PIO
-- TC
-- RTC
+- RTT
 - UART console (printf)
 
 **Código exemplo fornecido:**
 
-No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (`io_init`) e os callbacks dos botões já estão configurados. Temos uma task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para **não mexer** nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errada com o seu programa).
+No código fornecido (e que deve ser utilizado) os botões e LEDs da placa OLED já foram inicializados na função (`io_init`) e os callbacks dos botões já estão configurados. Temos uma `task_oled que é inicializada e fica exibindo no OLED um ponto piscando. Pedimos para **não mexer** nessa task, pois ela serve de debug para sabermos se seu programa travou (se parar de piscar tem alguma coisa errada com o seu programa).
 
 ## Descritivo
 
@@ -38,7 +37,7 @@ Vamos criar um protótipo de um datalogger, onde um sistema embarcado coleta per
 
 ![](diagrama.png)
 
-O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC, um log formatado seja enviado pela UART (`printf`) e uma verificação das condições de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log (UART/printf) deve possuir um timestamp que indicará quando o dado foi lido pelo sistema (DIA:MES:ANO HORA:MINUTO:SEGUNDO).
+O firmware vai ser composto por três tasks: `task_adc`, `task_events` e `task_alarm` além de duas filas: `xQueueEvent` e `xQueueADC` e dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`. A ideia é que a cada evento de botão ou a cada novo valor do ADC, um log formatado seja enviado pela UART (`printf`) e uma verificação das condições de alarme checadas, se um alarme for detectado a `task_alarm` deve ser iniciada. O log (UART/printf) deve possuir um timestamp que indicará quando o dado foi lido pelo sistema (`SS:`).
 
 A seguir mais detalhes de cada uma das tarefa:
 
@@ -46,19 +45,18 @@ A seguir mais detalhes de cada uma das tarefa:
 
 | Recurso               | Explicação                                           |
 |-----------------------|------------------------------------------------------|
-| RTC                   | Fornecer as informações do TimeStamp                 |
-| TC                    | Gerar o 1hz para a leitura do AFEC                   |
+| RTT                   | Fornecer as informações do TimeStamp                 |
 | AFEC                  | Leitura analógica                                    |
 |-----------------------|------------------------------------------------------|
 | `xQueueAFEC`          | Recebimento do valor do ADC                          |
 | `xSemaphoreAfecAlarm` | Liberação da `task_alarm` devido a condição de alarm |
 
-A `task_adc` vai ser responsável por coletar dados de uma entrada analógica via AFEC (usando algum TC para a base de tempo), os dados devem ser enviados do *callback* do AFEC via a fila `xQueueADC` a uma taxa de uma amostra por segundo (1hz). A cada novo dado do AFEC a condição de alarme deve ser verificada.
+A `task_adc` vai ser responsável por coletar dados de uma entrada analógica via AFEC, os dados devem ser enviados do *callback* do AFEC via a fila `xQueueADC` a uma taxa de uma amostra por segundo (1hz). A cada novo dado do AFEC a condição de alarme deve ser verificada.
 
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR`  --->  ( `$VALOR` deve ser o valor lido no AFEC )
+    - `[AFEC ] $SS $VALOR`  --->  ( `$VALOR` deve ser o valor lido no AFEC )
 1. Verificar a condicão de alarme:
     - 5 segundos com o valor do AFEC maior que 3000
     
@@ -68,13 +66,13 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreAfecAl
 
 O seguinte log deve ser enviado para a serial assim que lido um valor do AFEC.
 
-- `[AFEC] DD:MM:YYYY HH:MM:SS $Valor` (onde `$Valor` é o valor do AFEC).
+- `[AFEC] SS $Valor` (onde `$Valor` é o valor do AFEC).
 
 ### task_event 
 
 | Recurso                | Explicação                                           |
 |------------------------|------------------------------------------------------|
-| RTC                    | Fornecer as informações do TimeStamp                 |
+| RTT                   | Fornecer as informações do TimeStamp                 |
 | PIO                    | Leitura dos botões                                   |
 |------------------------|------------------------------------------------------|
 | `xQueueEvent`          | Recebimento dos eventos de botão                     |
@@ -86,7 +84,7 @@ A `task_event` será responsável por ler eventos de botão (subida, descida), p
 A task, ao receber os dados deve realizar a seguinte ação:
 
 1. Enviar pela UART o novo valor no formato a seguir:
-    - `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$status`
+    - `[EVENT] $SS $ID:$status`
         - `$ID`: id do botão (1,2,3)
         - `$status`: 1 (apertado), 0 (solto)
 1. Verificar a condição de alarme:
@@ -98,7 +96,7 @@ Caso a condição de alarme seja atingida, liberar o semáforo `xSemaphoreEventA
 
 O seguinte log deve ser enviado para a serial assim que detectado um evento no botão (subida/descida).
 
-- `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$Status`
+- `[EVENT] $SS $ID:$Status`
 
 ### task_alarm
 
@@ -120,15 +118,15 @@ Os alarmes são ativados pelos semáforos `xSemaphoreAfecAlarm` e `xSemaphoreEve
 
 Ao ativar um alarme, a `task_alarm` deve emitir um log pela serial no formato descrito a seguir:
 
-- `[ALARM] DD:MM:YYYY HH:MM:SS $Alarm` (onde `$Alarm` indica qual alarme que foi ativo).
+- `[ALARM] $SS $Alarm` (onde `$Alarm` indica qual alarme que foi ativo).
 
 #### OLED
 
 Exibir no OLED um log simplificado (um por linha):
 
 ```  
-mm:ss AFEC
-mm:ss Event
+$SS AFEC
+$SS Event
 ```
 
 ### Exemplo de log completo
@@ -136,20 +134,26 @@ mm:ss Event
 A seguir um exemplo de log, nele conseguimos verificar a leitura do AFEC, e no segundo 04 (5ª do log) o botão 1 foi pressionado, e depois solto no segundo 05. No segundo 06 o AFEC atinge um valor maior que o limite e fica assim por mais 5 segundos, ativando o alarme no segundo 9.
 
 ``` 
- [AFEC ] 19:03:2018 15:45:01 1220
- [AFEC ] 19:03:2018 15:45:02 1222
- [AFEC ] 19:03:2018 15:45:03 1234
- [AFEC ] 19:03:2018 15:45:04 1225
- [EVENT] 19:03:2018 15:45:04  1:1
- [AFEC ] 19:03:2018 15:45:04 1245
- [AFEC ] 19:03:2018 15:45:05 1245
- [EVENT] 19:03:2018 15:45:05  1:0
- [AFEC ] 19:03:2018 15:45:06 4000
- [AFEC ] 19:03:2018 15:45:07 4004
- [AFEC ] 19:03:2018 15:45:08 4002
- [AFEC ] 19:03:2018 15:45:08 4001
- [AFEC ] 19:03:2018 15:45:08 4001
- [ALARM] 19:03:2018 15:45:09 AFEC
+    |Evento
+    |
+    |     |Timestamp segundo 
+    |     |  
+    |     |   |Valor
+    v     v   v
+ [AFEC ] 01 1220
+ [AFEC ] 02 1222
+ [AFEC ] 03 1234
+ [AFEC ] 04 1225
+ [EVENT] 04  1:1
+ [AFEC ] 04 1245
+ [AFEC ] 05 1245
+ [EVENT] 05  1:0
+ [AFEC ] 06 4000
+ [AFEC ] 07 4004
+ [AFEC ] 08 4002
+ [AFEC ] 08 4001
+ [AFEC ] 08 4001
+ [ALARM] 09 AFEC
 ```
 
 ## Resumo
@@ -159,21 +163,26 @@ A seguir um resumo do que deve ser implementando:
 - Leitura do AFEC via TC 1hz e envio do dado para a fila `xQueueAfec`
 - Leitura dos botões do OLED via IRQ e envio do dado para fila `xQueueEvent`
 - `task_afec`
-    - log:  `[AFEC ] DD:MM:YYYY HH:MM:SS $VALOR` 
+    - log:  `[AFEC ] $SS $VALOR` 
     - alarme se o valor do AFEC estiver maior que 3000 durante 5s
         - libera semáforo `xSemaphoreAfecAlarm`
 - `task_event`
-    - log:  `[EVENT] DD:MM:YYYY HH:MM:SS $ID:$STATUS` 
+    - log:  `[EVENT] $SS $ID:$STATUS` 
     - alarme se houver dois botões pressionados ao mesmo tempo
         - libera semáforo `xSemaphoreEventAlarm`
 - `task_alarm`
     - verifica dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`
-    - quanto liberado o semáforo, gerar o log:  `[ALARM] DD:MM:YYYY HH:MM:SS $ALARM` 
+    - quanto liberado o semáforo, gerar o log:  `[ALARM] $SS $ALARM` 
     - piscar led 1 dado se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
     - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
     - Exibir no OLED as informações do alarme
     
 :bangbang: :warning: :bangbang: Não devem ser utilizadas **variáveis globais**, todo o processo deve ser feito através das filas e semáforos. :bangbang: :warning: :bangbang:
+
+## Regras de software
+
+- Não usar variável global (apenas recursos do RTOS)
+- Passar no codequality 
 
 ### Dicas
 
