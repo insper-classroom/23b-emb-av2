@@ -4,7 +4,7 @@ Prezado aluno:
 
 - A prova é prática, com o objetivo de avaliar sua compreensão a cerca do conteúdo da disciplina. 
 - É permitido consulta a todo material pessoal (suas anotações, códigos), lembre que você mas não pode consultar outros alunos.
-- Duração total: 3h
+- Duração total: 2h 
 
 Sobre a avaliacão:
 
@@ -173,8 +173,8 @@ A seguir um resumo do que deve ser implementando:
 - `task_alarm`
     - verifica dois semáforos: `xSemaphoreEventAlarm` e `xSemaphoreAfecAlarm`
     - quanto liberado o semáforo, gerar o log:  `[ALARM] $SS $ALARM` 
-    - piscar led 1 dado se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
-    - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
+    - **piscar** led 1 se alarm AFEC ativo (`xSemaphoreAfecAlarm`)
+    - **piscar** led 2 se alarm EVENT ativo (`xSemaphoreEventAlarm`)
     - Exibir no OLED as informações do alarme
     
 
