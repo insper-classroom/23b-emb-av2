@@ -177,10 +177,10 @@ A seguir um resumo do que deve ser implementando:
     - piscar led 2 dado se alarm EVENT ativo (`xSemaphoreEventAlarm`)
     - Exibir no OLED as informações do alarme
     
-:bangbang: :warning: :bangbang: Não devem ser utilizadas **variáveis globais**, todo o processo deve ser feito através das filas e semáforos. :bangbang: :warning: :bangbang:
 
 ## Regras de software
 
+- Seguir a estrutura de firmware descrita!
 - Não usar variável global (apenas recursos do RTOS)
 - Passar no codequality 
 
